@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر العطور الفاخرة | نظام الفواتير والمبيعات</title>
+    <!-- Google Fonts - Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #e0f2f1 0%, #eaeaf7 100%);
+            --bg-secondary: rgba(255, 255, 255, 0.45);
+            --bg-card: rgba(255, 255, 255, 0.65);
+            --bg-sidebar: rgba(255, 255, 255, 0.4);
+            --accent-gold: #0d5c58;
+            --accent-gold-hover: #0a4744;
+            --accent-pink: #008080;
+            --accent-pink-hover: #006666;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: rgba(255, 255, 255, 0.5);
+            --border-glow: rgba(0, 128, 128, 0.15);
+            --glass-blur: blur(20px);
+            --shadow-premium: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+            --font-family: 'Tajawal', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            background-attachment: fixed;
+        }
+
+        /* --- Scrollbar styling --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-gold);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(207, 168, 96, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(207, 168, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(207, 168, 96, 0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* --- Login Overlay --- */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(230, 240, 240, 0.4);
+            backdrop-filter: var(--glass-blur);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .login-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(207, 168, 96, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .logo-area {
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-pink));
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 20px rgba(207, 168, 96, 0.3);
+        }
+
+        .logo-icon svg {
+            fill: #fff;
+            width: 35px;
+            height: 35px;
+        }
+
+        .login-card h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: right;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-control {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .input-control:focus {
+            border-color: var(--accent-pink);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 10px rgba(0, 128, 128, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-pink));
+            color: #fff;
+            border: none;
+            padding: 0.9rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(207, 168, 96, 0.2);
+        }
+
+        .login-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(207, 168, 96, 0.35);
+        }
+
+        .login-error {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #ea868f;
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: center;
+        }
+
+        /* --- Main Layout --- */
+        #main-app {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        #main-app.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border-color);
+            backdrop-filter: var(--glass-blur);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(207, 168, 96, 0.1);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-pink));
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sidebar-logo-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .sidebar-logo h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            font-weight: 400;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .nav-item button {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 0.9rem 1.2rem;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: right;
+            transition: var(--transition);
+        }
+
+        .nav-item button svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .nav-item.active button,
+        .nav-item button:hover {
+            color: var(--text-primary);
+            background: rgba(0, 128, 128, 0.06);
+        }
+
+        .nav-item.active button {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-gold));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 128, 128, 0.15);
+            border: none;
+        }
+        
+        .nav-item.active button svg {
+            fill: #fff;
+        }
+
+        .nav-item.active button svg,
+        .nav-item button:hover svg {
+            fill: var(--accent-gold);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: bold;
+        }
+
+        .logout-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #ef4444;
+        }
+
+        /* --- Main Content Area --- */
+        .content-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .top-bar {
+            height: 70px;
+            background: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            flex-shrink: 0;
+        }
+
+        .top-bar-title h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255,255,255,0.03);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Content Views */
+        .view-panel {
+            flex-grow: 1;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* --- Sales View Split Layout --- */
+        .sales-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .sales-layout {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+        }
+
+        /* Catalog Section */
+        .catalog-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1100px) {
+            .catalog-section {
+                overflow: visible;
+            }
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .search-wrapper svg {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 50px;
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-pink);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 10px rgba(0, 128, 128, 0.1);
+        }
+
+        /* Category Filter Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .cat-tab {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-secondary);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .cat-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .cat-tab.active {
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 700;
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(207, 168, 96, 0.25);
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.2rem;
+            overflow-y: auto;
+            padding-right: 4px;
+            padding-bottom: 1.5rem;
+        }
+
+        @media (max-width: 1100px) {
+            .products-grid {
+                overflow-y: visible;
+            }
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--shadow-premium);
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-pink);
+            box-shadow: 0 8px 25px rgba(0, 128, 128, 0.08);
+        }
+
+        .product-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 128, 128, 0.08);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+        }
+
+        .product-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: var(--accent-gold);
+        }
+
+        .product-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+            height: 2.4rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .product-price span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .add-to-bill-btn {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-pink));
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-to-bill-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(209, 82, 141, 0.4);
+        }
+
+        .add-to-bill-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: white;
+        }
+
+        /* Billing Section (Cart Drawer) */
+        .billing-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 1100px) {
+            .billing-section {
+                height: auto;
+                max-height: 700px;
+            }
+        }
+
+        .billing-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-count {
+            background: var(--accent-pink);
+            color: #fff;
+            font-size: 0.8rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .cart-items-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 4px;
+        }
+
+        .empty-cart-msg {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        /* Cart Item Card */
+        .cart-item {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 12px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+            padding-left: 0.5rem;
+        }
+
+        .cart-item-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .cart-item-price {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .cart-item-qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.04);
+            padding: 0.25rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .qty-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .qty-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .qty-btn svg {
+            width: 10px;
+            height: 10px;
+            fill: var(--text-primary);
+        }
+
+        .qty-val {
+            font-size: 0.9rem;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .cart-item-total {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-right: 0.75rem;
+            min-width: 65px;
+            text-align: left;
+        }
+
+        .remove-cart-item {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 0.25rem;
+        }
+
+        .remove-cart-item svg {
+            width: 16px;
+            height: 16px;
+            fill: #ef4444;
+        }
+
+        /* Customer Details Form inside Cart */
+        .customer-details-card {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 12px;
+            padding: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .customer-details-card h4 {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.6rem;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .customer-details-card h4 svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-gold);
+        }
+
+        .small-form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .small-input {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 6px;
+            padding: 0.45rem 0.6rem;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .small-input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        /* Cart Footer Pricing and Buttons */
+        .cart-footer {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .price-row.grand-total {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        .cart-actions {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .checkout-btn {
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-pink));
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .checkout-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* --- History View Table --- */
+        .history-table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        .premium-table th {
+            color: var(--accent-gold);
+            font-weight: 700;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .premium-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--text-primary);
+        }
+
+        .premium-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .history-action-btn {
+            background: rgba(207, 168, 96, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid rgba(207, 168, 96, 0.2);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .history-action-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        /* --- Inventory View Controls --- */
+        .inventory-view {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .inventory-view {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .inventory-form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .inventory-form-card h3 {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .action-grid {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .action-grid button {
+            flex-grow: 1;
+        }
+
+        .outline-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            padding: 0.7rem;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .outline-btn:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        /* --- Bill Modal --- */
+        #bill-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        #bill-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bill-modal-card {
+            background: white;
+            color: #222;
+            width: 100%;
+            max-width: 580px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .bill-modal-actions {
+            background: var(--bg-sidebar);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .bill-modal-actions h3 {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .close-bill-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .print-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .print-btn:hover {
+            background: var(--accent-gold-hover);
+        }
+
+        /* Printable Area CSS */
+        .bill-print-content {
+            padding: 2rem;
+            overflow-y: auto;
+            background: white;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px dashed #444;
+            padding-bottom: 1rem;
+        }
+
+        .receipt-title {
+            font-family: var(--font-family);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .receipt-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            text-align: right;
+        }
+
+        .receipt-table th {
+            border-bottom: 1px dashed #444;
+            border-top: 1px dashed #444;
+            padding: 0.5rem 0;
+            font-weight: bold;
+        }
+
+        .receipt-table td {
+            padding: 0.6rem 0;
+        }
+
+        .receipt-total-section {
+            border-top: 1px dashed #444;
+            padding-top: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .receipt-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+        }
+
+        .receipt-total-row.grand-total {
+            font-size: 1.15rem;
+            border-top: 1px solid #444;
+            padding-top: 0.4rem;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.85rem;
+            border-top: 1px dashed #444;
+            padding-top: 1rem;
+            font-style: italic;
+        }
+
+        /* --- Print Specific Styles --- */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #bill-modal, #bill-modal *, .bill-modal-card, .bill-print-content, .bill-print-content * {
+                visibility: visible;
+            }
+            #bill-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                background: white;
+            }
+            .bill-modal-card {
+                box-shadow: none;
+                max-height: none;
+                width: 100%;
+            }
+            .bill-modal-actions {
+                display: none; /* Hide top bar during print */
+            }
+            .bill-print-content {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <!-- Perfume bottle SVG -->
+                        <path d="M7,10A2,2 0 0,1 9,8H15A2,2 0 0,1 17,10V11H19A2,2 0 0,1 21,13V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V13A2,2 0 0,1 5,11H7V10M9,10V11H15V10H9M5,13V20H19V13H5M12,4A2,2 0 0,1 14,6V7H10V6A2,2 0 0,1 12,4Z"/>
+                    </svg>
+                </div>
+                <h2>نظام المبيعات</h2>
+            </div>
+            
+            <div class="login-error" id="login-error-msg">خطأ في اسم المستخدم أو كلمة المرور!</div>
+
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" class="input-control" placeholder="أدخل اسم المستخدم (Admin)" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" class="input-control" placeholder="أدخل كلمة المرور (1234)">
+            </div>
+
+            <button onclick="handleLogin()" class="login-btn">تسجيل الدخول</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP VIEW -->
+    <div id="main-app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M7,10A2,2 0 0,1 9,8H15A2,2 0 0,1 17,10V11H19A2,2 0 0,1 21,13V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V13A2,2 0 0,1 5,11H7V10M9,10V11H15V10H9M5,13V20H19V13H5M12,4A2,2 0 0,1 14,6V7H10V6A2,2 0 0,1 12,4Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>نظام المبيعات</h1>
+                    <span>بوابة إدارة المبيعات</span>
+                </div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" id="nav-sales" onclick="switchView('sales')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/></svg>
+                        لوحة الفواتير والمبيعات
+                    </button>
+                </li>
+                <li class="nav-item" id="nav-inventory" onclick="switchView('inventory')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M10,17V15H14V17H10M3,5H21V7H3V5M3,9H21V11H3V9M3,13H21V15H3V13M3,17H21V19H3V17Z"/></svg>
+                        إدارة المنتجات والمخزون
+                    </button>
+                </li>
+                <li class="nav-item" id="nav-history" onclick="switchView('history')">
+                    <button>
+                        <svg viewBox="0 0 24 24"><path d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.9,16L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3M12,8V13L16.28,15.54L17,14.22L13.5,12.15V8H12Z"/></svg>
+                        سجل الفواتير
+                    </button>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <span>المستخدم: <strong style="color:var(--accent-gold)">Admin</strong></span>
+                <button onclick="handleLogout()" class="logout-btn">
+                    <svg viewBox="0 0 24 24"><path d="M14.08,15.59L16.67,13H7V11H16.67L14.08,8.41L15.5,7L20.5,12L15.5,17L14.08,15.59M19,3A2,2 0 0,1 21,5V9.67L19,7.67V5H5V19H19V16.33L21,14.33V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19Z"/></svg>
+                    خروج
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTAINER FOR VIEWS -->
+        <main class="content-container">
+            <!-- TOP BAR -->
+            <header class="top-bar">
+                <div class="top-bar-title">
+                    <h2 id="view-title">لوحة الفواتير والمبيعات</h2>
+                </div>
+                <div class="user-profile">
+                    <span>مرحباً، المسؤول</span>
+                    <div class="user-avatar">A</div>
+                </div>
+            </header>
+
+            <!-- VIEW: SALES & BILLING -->
+            <section id="view-sales" class="view-panel active">
+                <div class="sales-layout">
+                    <!-- Left: Product Catalog -->
+                    <div class="catalog-section">
+                        <div class="catalog-header">
+
+                            <!-- Search -->
+                            <div class="search-wrapper">
+                                <svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
+                                <input type="text" id="catalog-search" class="search-input" placeholder="ابحث عن عطر..." oninput="renderCatalog()">
+                            </div>
+                        </div>
+
+                        <!-- Catalog Grid -->
+                        <div class="products-grid" id="products-grid-container">
+                            <!-- Generated Dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Shopping Cart/Invoice Details -->
+                    <div class="billing-section">
+                        <div class="billing-title">
+                            <h3>تفاصيل الفاتورة الحالية</h3>
+                            <span class="cart-count" id="cart-count-badge">0 مل</span>
+                        </div>
+
+                        <!-- Cart Items -->
+                        <div class="cart-items-wrapper" id="cart-items-container">
+                            <div class="empty-cart-msg">سلة الفاتورة فارغة. اختر عطوراً من المعرض للبدء!</div>
+                        </div>
+
+                        <!-- Customer Info Form -->
+                        <div class="customer-details-card">
+                            <h4>
+                                <svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg>
+                                معلومات الزبون
+                            </h4>
+                            <div class="small-form-group">
+                                <input type="text" id="customer-name" class="small-input" placeholder="اسم الزبون" autocomplete="off">
+                                <input type="text" id="customer-phone" class="small-input" placeholder="رقم الهاتف" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <!-- Bill Footer Prices -->
+                        <div class="cart-footer">
+                            <div class="price-row grand-total" style="border-top: none; margin-top: 0; padding-top: 0;">
+                                <span>المبلغ الاجمالي:</span>
+                                <span id="val-grandtotal">0 د.ع</span>
+                            </div>
+
+                            <div class="cart-actions">
+                                <button onclick="generateInvoice()" class="checkout-btn">إصدار الفاتورة</button>
+                                <button onclick="clearCart()" class="cancel-btn">إلغاء</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: INVENTORY -->
+            <section id="view-inventory" class="view-panel">
+                <div class="inventory-view">
+                    <!-- Left: Form to Add/Edit Product -->
+                    <div class="inventory-form-card">
+                        <h3 id="form-action-title">إضافة عطر جديد</h3>
+                        <input type="hidden" id="edit-product-id">
+                        
+                        <div class="form-group">
+                            <label>اسم العطر</label>
+                            <input type="text" id="prod-name" class="input-control" placeholder="مثال: شانيل كوكو فاخر" autocomplete="off">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>السعر (د.ع)</label>
+                            <input type="number" id="prod-price" class="input-control" placeholder="السعر بالدينار" min="0">
+                        </div>
+
+
+
+                        <div class="action-grid">
+                            <button onclick="saveProduct()" class="checkout-btn">حفظ المنتج</button>
+                            <button onclick="clearProductForm()" class="outline-btn">إلغاء</button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Inventory List Table -->
+                    <div class="history-table-card" style="overflow-y:auto; max-height:calc(100vh - 150px);">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم المنتج</th>
+
+                                    <th>السعر</th>
+                                    <th style="text-align: center;">العمليات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body">
+                                <!-- Generated Dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: BILL HISTORY -->
+            <section id="view-history" class="view-panel">
+                <div class="history-table-card">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>تاريخ الفاتورة</th>
+                                <th>اسم الزبون</th>
+                                <th>رقم الزبون</th>
+                                <th>المبلغ الاجمالي</th>
+                                <th style="text-align: center;">الخيارات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- Generated Dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- BILL MODAL (PRINTABLE RECEIPT) -->
+    <div id="bill-modal">
+        <div class="bill-modal-card">
+            <!-- Top Controls -->
+            <div class="bill-modal-actions">
+                <h3>معاينة الفاتورة قبل الطباعة</h3>
+                <div style="display:flex; gap:0.75rem; align-items:center;">
+                    <button class="print-btn" onclick="window.print()">
+                        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M18,3H6V7H18M19,12A1,1 0 0,1 18,11A1,1 0 0,1 19,10A1,1 0 0,1 20,11A1,1 0 0,1 19,12M16,19H8V14H16M19,8H5A3,3 0 0,0 2,11V17H6V21H18V17H22V11A3,3 0 0,0 19,8Z"/></svg>
+                        طباعة الفاتورة
+                    </button>
+                    <button class="close-bill-btn" onclick="closeBillModal()">&times;</button>
+                </div>
+            </div>
+
+            <!-- Receipt Print Area -->
+            <div class="bill-print-content" id="print-area">
+                <!-- Loaded dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION SCRIPTS -->
+    <script>
+                // --- Helpers for currency formatting ---
+        function formatPrice(val) {
+            return parseFloat(val).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2}) + ' د.ع';
+        }
+        function formatPriceWithoutUnit(val) {
+            return parseFloat(val).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+        }
+
+        // --- Default Products (Price per 1 ML) ---
+        const defaultCatalog = [
+            { id: 1, name: "Stardust Cuddle", price: 4.50 },
+            { id: 2, name: "Chanel coco", price: 25.00 },
+            { id: 3, name: "Bellavita", price: 6.00 },
+            { id: 4, name: "Secret", price: 3.50 },
+            { id: 5, name: "Dream perfume", price: 2.00 },
+            { id: 6, name: "Renee Bloom", price: 4.00 },
+            { id: 7, name: "Skinn by titan", price: 1.50 },
+            { id: 8, name: "Og beauty luxury", price: 5.00 },
+            { id: 9, name: "Renee Ombre", price: 1.00 },
+            { id: 10, name: "Chicco baby", price: 4.50 },
+            { id: 11, name: "Coconut vanilla", price: 2.00 },
+            { id: 12, name: "Sebamed baby", price: 9.00 },
+            { id: 13, name: "Coco crush", price: 2.00 },
+            { id: 14, name: "Dvija natural and safe baby perfume", price: 1.50 },
+            { id: 15, name: "Indovaia perfume", price: 3.00 },
+            { id: 16, name: "Turkish oud", price: 2.50 },
+            { id: 17, name: "Twistedlily jasmine", price: 2.20 },
+            { id: 18, name: "Pheromone", price: 7.00 }
+        ];
+
+        // --- App State variables ---
+        let currentTab = "sales";
+        let catalog = [];
+        let cart = [];
+        let history = [];
+
+        // --- Initialize Database & State ---
+        function initApp() {
+            // Load state from localStorage or load defaults
+            try {
+                const savedCatalog = localStorage.getItem("perfume_catalog_v2");
+                if (savedCatalog) {
+                    catalog = JSON.parse(savedCatalog);
+                } else {
+                    catalog = [...defaultCatalog];
+                    localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                }
+            } catch (e) {
+                console.error("Error parsing catalog, loading defaults", e);
+                catalog = [...defaultCatalog];
+            }
+
+            try {
+                const savedHistory = localStorage.getItem("perfume_billing_history_v2");
+                if (savedHistory) {
+                    history = JSON.parse(savedHistory);
+                } else {
+                    history = [];
+                    localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
+                }
+            } catch (e) {
+                console.error("Error parsing history, loading defaults", e);
+                history = [];
+            }
+
+            // Check if logged in in this session
+            const isLoggedIn = sessionStorage.getItem("perfume_admin_logged");
+            if (isLoggedIn === "true") {
+                document.getElementById("login-overlay").style.display = "none";
+                document.getElementById("main-app").classList.add("active");
+            }
+
+            renderCatalog();
+            renderCart();
+            renderInventoryTable();
+            renderHistoryTable();
+        }
+
+        // --- Login Logic ---
+        function handleLogin() {
+            const user = document.getElementById("username").value.trim();
+            const pass = document.getElementById("password").value.trim();
+            const errMsg = document.getElementById("login-error-msg");
+            const loginCard = document.querySelector(".login-card");
+
+            if (user === "Admin" && pass === "1234") {
+                errMsg.style.display = "none";
+                sessionStorage.setItem("perfume_admin_logged", "true");
+                
+                // Animate overlay transition
+                const overlay = document.getElementById("login-overlay");
+                overlay.style.opacity = "0";
+                overlay.style.pointerEvents = "none";
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                }, 300);
+
+                document.getElementById("main-app").classList.add("active");
+            } else {
+                errMsg.style.display = "block";
+                loginCard.style.animation = "none";
+                setTimeout(() => {
+                    loginCard.style.animation = "shake 0.4s ease";
+                }, 10);
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem("perfume_admin_logged");
+            const overlay = document.getElementById("login-overlay");
+            overlay.style.display = "flex";
+            setTimeout(() => {
+                overlay.style.opacity = "1";
+                overlay.style.pointerEvents = "auto";
+            }, 10);
+            document.getElementById("main-app").classList.remove("active");
+            
+            // Reset input values
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("login-error-msg").style.display = "none";
+        }
+
+        // --- Navigation Switch ---
+        function switchView(viewName) {
+            currentTab = viewName;
+            
+            // Remove active classes
+            document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+            document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
+
+            // Add active classes
+            document.getElementById(`nav-${viewName}`).classList.add("active");
+            document.getElementById(`view-${viewName}`).classList.add("active");
+
+            // Update Header Title
+            const titles = {
+                "sales": "لوحة الفواتير والمبيعات",
+                "inventory": "إدارة المنتجات والمخزون",
+                "history": "سجل الفواتير التاريخية"
+            };
+            document.getElementById("view-title").textContent = titles[viewName];
+
+            // Re-render relevant grids
+            if (viewName === "inventory") {
+                renderInventoryTable();
+            } else if (viewName === "history") {
+                renderHistoryTable();
+            }
+        }
+
+        // --- Categories removed ---
+
+        // --- Render Products Catalog ---
+        function renderCatalog() {
+            const container = document.getElementById("products-grid-container");
+            container.innerHTML = "";
+
+            const query = document.getElementById("catalog-search").value.toLowerCase().trim();
+
+            const filteredProducts = catalog.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(query);
+                return matchesSearch;
+            }).sort((a, b) => b.id - a.id);
+
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 3rem;">لا توجد منتجات مطابقة للبحث.</div>`;
+                return;
+            }
+
+            filteredProducts.forEach(prod => {
+                const card = document.createElement("div");
+                card.className = "product-card animate-fade-in";
+                card.innerHTML = `
+                    <div class="product-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M7,10A2,2 0 0,1 9,8H15A2,2 0 0,1 17,10V11H19A2,2 0 0,1 21,13V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V13A2,2 0 0,1 5,11H7V10M9,10V11H15V10H9M5,13V20H19V13H5M12,4A2,2 0 0,1 14,6V7H10V6A2,2 0 0,1 12,4Z"/>
+                        </svg>
+                    </div>
+                    <div class="product-name" title="${prod.name}">${prod.name}</div>
+                    <div class="product-meta">
+                        <div class="product-price">${prod.price.toFixed(2)} <span>د.ع / مل</span></div>
+                        <button class="add-to-bill-btn" onclick="addToCart(${prod.id})" title="إضافة للفاتورة">
+                            <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- Cart Management ---
+        function addToCart(id) {
+            const product = catalog.find(p => p.id === id);
+            if (!product) return;
+
+            const cartItem = cart.find(item => item.product.id === id);
+            if (cartItem) {
+                cartItem.quantity += 50; // Increase by 50ml default
+            } else {
+                cart.push({ product, quantity: 50 }); // Start with 50ml default
+            }
+            renderCart();
+        }
+
+        function updateCartQty(id, amount) {
+            const cartItem = cart.find(item => item.product.id === id);
+            if (!cartItem) return;
+
+            cartItem.quantity += amount;
+            if (cartItem.quantity <= 0) {
+                removeFromCart(id);
+            } else {
+                renderCart();
+            }
+        }
+
+        function setCartQty(id, val) {
+            const num = parseInt(val);
+            if (isNaN(num) || num <= 0) return;
+            const cartItem = cart.find(item => item.product.id === id);
+            if (!cartItem) return;
+            cartItem.quantity = num;
+            renderCart();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.product.id !== id);
+            renderCart();
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm("هل أنت متأكد من رغبتك في إفراغ السلة الحالية؟")) {
+                cart = [];
+                document.getElementById("customer-name").value = "";
+                document.getElementById("customer-phone").value = "";
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById("cart-items-container");
+            const countBadge = document.getElementById("cart-count-badge");
+            container.innerHTML = "";
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="empty-cart-msg">سلة الفاتورة فارغة. اختر عطوراً من المعرض للبدء!</div>`;
+                countBadge.textContent = "0 مل";
+                updateTotals(0);
+                return;
+            }
+
+            let totalItems = 0;
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                totalItems += item.quantity;
+                const totalItemPrice = item.product.price * item.quantity;
+                subtotal += totalItemPrice;
+
+                const card = document.createElement("div");
+                card.className = "cart-item";
+                card.innerHTML = `
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.product.name}</div>
+                        <div class="cart-item-price">${formatPrice(item.product.price)} / mL</div>
+                    </div>
+                    <div class="cart-item-qty-controls" style="display:flex; align-items:center; gap:0.25rem;">
+                        <button class="qty-btn" onclick="updateCartQty(${item.product.id}, -10)" title="-10 مل">
+                            <svg viewBox="0 0 24 24"><path d="M19,13H5V11H19V13Z"/></svg>
+                        </button>
+                        <input type="number" class="small-input" style="width: 65px; text-align: center; padding: 0.2rem; font-weight: bold; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;" min="1" value="${item.quantity}" onchange="setCartQty(${item.product.id}, this.value)">
+                        <span style="font-size: 0.8rem; color: var(--text-secondary); margin-right: 2px;">مل</span>
+                        <button class="qty-btn" onclick="updateCartQty(${item.product.id}, 10)" title="+10 مل">
+                            <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
+                        </button>
+                    </div>
+                    <div class="cart-item-total">${formatPrice(totalItemPrice)}</div>
+                    <button class="remove-cart-item" onclick="removeFromCart(${item.product.id})" title="حذف">
+                        <svg viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+
+            countBadge.textContent = `${totalItems} مل`;
+            updateTotals(subtotal);
+        }
+
+        function updateTotals(subtotal) {
+            document.getElementById("val-grandtotal").textContent = formatPrice(subtotal);
+        }
+
+        // --- Bill Modal Generation ---
+        function generateInvoice() {
+            const custName = document.getElementById("customer-name").value.trim();
+            const custPhone = document.getElementById("customer-phone").value.trim();
+
+            if (cart.length === 0) {
+                alert("السلة فارغة! يرجى إضافة عطور لتوليد الفاتورة.");
+                return;
+            }
+
+            if (!custName || !custPhone) {
+                alert("يرجى إدخال اسم الزبون ورقم هاتفه لإتمام عملية البيع.");
+                return;
+            }
+
+            if (!/^\d+$/.test(custPhone)) {
+                alert("يرجى إدخال رقم هاتف زبون صحيح (أرقام فقط).");
+                return;
+            }
+
+            // Generate Invoice Data
+            const invoiceId = "INV-" + Date.now().toString().slice(-6);
+            const date = new Date();
+            let hours = date.getHours();
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const formattedDate = date.getFullYear() + "/" + 
+                                  String(date.getMonth() + 1).padStart(2, '0') + "/" + 
+                                  String(date.getDate()).padStart(2, '0') + " " + 
+                                  String(hours).padStart(2, '0') + ":" + 
+                                  String(date.getMinutes()).padStart(2, '0') + ":" + 
+                                  String(date.getSeconds()).padStart(2, '0') + " " + ampm;
+
+            const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
+            // Save to billing history
+            const newInvoice = {
+                id: invoiceId,
+                date: formattedDate,
+                customer: custName,
+                phone: custPhone,
+                items: cart.map(item => ({
+                    name: item.product.name,
+                    price: item.product.price,
+                    quantity: item.quantity,
+                    total: item.product.price * item.quantity
+                })),
+                total: total
+            };
+
+            history.unshift(newInvoice); // Add to beginning of array
+            localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
+
+            // Load Print HTML Template
+            let itemsHtml = "";
+            newInvoice.items.forEach((item, index) => {
+                itemsHtml += `
+                    <tr>
+                        <td style="text-align:right;">${item.name}</td>
+                        <td style="text-align:center;">${formatPriceWithoutUnit(item.price)}</td>
+                        <td style="text-align:center;">${item.quantity} mL</td>
+                        <td style="text-align:left;">${formatPriceWithoutUnit(item.total)}</td>
+                    </tr>
+                `;
+            });
+
+            const printArea = document.getElementById("print-area");
+            printArea.innerHTML = `
+                <div class="receipt-header">
+                    <h1 class="receipt-title">فاتورة مبيعات</h1>
+                </div>
+
+                <div class="receipt-meta">
+                    <div><strong>رقم الفاتورة:</strong> ${newInvoice.id}</div>
+                    <div style="text-align:left;"><strong>التاريخ:</strong> ${newInvoice.date}</div>
+                </div>
+                <div class="receipt-meta" style="margin-bottom:1rem;">
+                    <div><strong>الزبون:</strong> ${newInvoice.customer}</div>
+                    <div style="text-align:left;"><strong>الهاتف:</strong> ${newInvoice.phone}</div>
+                </div>
+
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align:right; width: 45%;">المادة</th>
+                            <th style="text-align:center; width: 18%;">سعر / mL</th>
+                            <th style="text-align:center; width: 18%;">الكمية / mL</th>
+                            <th style="text-align:left; width: 19%;">المبلغ الاجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+
+                <div class="receipt-total-section">
+                    <div class="receipt-total-row grand-total">
+                        <span>المبلغ الاجمالي:</span>
+                        <span>${formatPrice(newInvoice.total)}</span>
+                    </div>
+                </div>
+
+                <div class="receipt-footer">
+                    <div>شكراً لزيارتكم! نأمل أن تكون تجربة تسوقكم مميزة.</div>
+                    <div style="margin-top:0.4rem; font-size:0.75rem;">A.R.H System v0.1</div>
+                </div>
+            `;
+
+            // Open Modal
+            document.getElementById("bill-modal").classList.add("active");
+
+            // Reset current cart
+            cart = [];
+            document.getElementById("customer-name").value = "";
+            document.getElementById("customer-phone").value = "";
+            renderCart();
+            renderHistoryTable();
+        }
+
+        function closeBillModal() {
+            document.getElementById("bill-modal").classList.remove("active");
+        }
+
+        // --- History Table Render ---
+        function renderHistoryTable() {
+            const tbody = document.getElementById("history-table-body");
+            tbody.innerHTML = "";
+
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding:2rem;">لا توجد فواتير مصدرة حالياً.</td></tr>`;
+                return;
+            }
+
+            history.forEach(inv => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="font-weight:bold; color:var(--accent-gold);">${inv.id}</td>
+                    <td>${inv.date}</td>
+                    <td>${inv.customer}</td>
+                    <td>${inv.phone}</td>
+                    <td style="font-weight:bold;">${formatPrice(inv.total)}</td>
+                    <td style="text-align:center;">
+                        <button class="history-action-btn" onclick="reprintInvoice('${inv.id}')">طباعة / معاينة</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        function reprintInvoice(id) {
+            const invoice = history.find(inv => inv.id === id);
+            if (!invoice) return;
+
+            let itemsHtml = "";
+            invoice.items.forEach(item => {
+                itemsHtml += `
+                    <tr>
+                        <td style="text-align:right;">${item.name}</td>
+                        <td style="text-align:center;">${formatPriceWithoutUnit(item.price)}</td>
+                        <td style="text-align:center;">${item.quantity} mL</td>
+                        <td style="text-align:left;">${formatPriceWithoutUnit(item.total)}</td>
+                    </tr>
+                `;
+            });
+
+            const printArea = document.getElementById("print-area");
+            printArea.innerHTML = `
+                <div class="receipt-header">
+                    <h1 class="receipt-title">فاتورة مبيعات</h1>
+                </div>
+
+                <div class="receipt-meta">
+                    <div><strong>رقم الفاتورة:</strong> ${invoice.id}</div>
+                    <div style="text-align:left;"><strong>التاريخ:</strong> ${invoice.date}</div>
+                </div>
+                <div class="receipt-meta" style="margin-bottom:1rem;">
+                    <div><strong>الزبون:</strong> ${invoice.customer}</div>
+                    <div style="text-align:left;"><strong>الهاتف:</strong> ${invoice.phone}</div>
+                </div>
+
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align:right; width: 45%;">المادة</th>
+                            <th style="text-align:center; width: 18%;">سعر / mL</th>
+                            <th style="text-align:center; width: 18%;">الكمية / mL</th>
+                            <th style="text-align:left; width: 19%;">المبلغ الاجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+
+                <div class="receipt-total-section">
+                    <div class="receipt-total-row grand-total">
+                        <span>المبلغ الاجمالي:</span>
+                        <span>${formatPrice(invoice.total)}</span>
+                    </div>
+                </div>
+
+                <div class="receipt-footer">
+                    <div>شكراً لزيارتكم! نأمل أن تكون تجربة تسوقكم مميزة.</div>
+                    <div style="margin-top:0.4rem; font-size:0.75rem;">A.R.H System v0.1</div>
+                </div>
+            `;
+
+            document.getElementById("bill-modal").classList.add("active");
+        }
+
+        // --- Inventory Management ---
+        function renderInventoryTable() {
+            const tbody = document.getElementById("inventory-table-body");
+            tbody.innerHTML = "";
+
+            catalog.forEach(prod => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="font-weight:600;">${prod.name}</td>
+                    <td style="font-weight:700; color:var(--accent-gold);">${formatPrice(prod.price)} / mL</td>
+                    <td style="text-align:center; display:flex; gap:0.5rem; justify-content:center;">
+                        <button class="history-action-btn" onclick="editProduct(${prod.id})" style="background:rgba(79, 70, 229, 0.1); color:#818cf8; border-color:rgba(79, 70, 229, 0.2);">تعديل</button>
+                        <button class="history-action-btn" onclick="deleteProduct(${prod.id})" style="background:rgba(239, 68, 68, 0.1); color:#f87171; border-color:rgba(239, 68, 68, 0.2);">حذف</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function saveProduct() {
+            const editId = document.getElementById("edit-product-id").value;
+            const name = document.getElementById("prod-name").value.trim();
+            const price = parseFloat(document.getElementById("prod-price").value);
+
+            if (!name || isNaN(price) || price < 0) {
+                alert("يرجى إدخال اسم عطر صحيح وسعر أكبر من أو يساوي الصفر.");
+                return;
+            }
+
+            if (editId) {
+                // EDIT EXISTING
+                const prod = catalog.find(p => p.id === parseInt(editId));
+                if (prod) {
+                    prod.name = name;
+                    prod.price = price;
+                }
+            } else {
+                // ADD NEW
+                const newId = catalog.length > 0 ? Math.max(...catalog.map(p => p.id)) + 1 : 1;
+                catalog.push({
+                    id: newId,
+                    name,
+                    price
+                });
+            }
+
+            localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+            clearProductForm();
+            renderInventoryTable();
+            renderCatalog();
+        }
+
+        function editProduct(id) {
+            const prod = catalog.find(p => p.id === id);
+            if (!prod) return;
+
+            document.getElementById("edit-product-id").value = prod.id;
+            document.getElementById("prod-name").value = prod.name;
+            document.getElementById("prod-price").value = prod.price;
+
+            document.getElementById("form-action-title").textContent = "تعديل تفاصيل العطر";
+        }
+
+        function deleteProduct(id) {
+            if (confirm("هل أنت متأكد من رغبتك في حذف هذا العطر من القائمة؟")) {
+                catalog = catalog.filter(p => p.id !== id);
+                localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                renderInventoryTable();
+                renderCatalog();
+            }
+        }
+
+        function clearProductForm() {
+            document.getElementById("edit-product-id").value = "";
+            document.getElementById("prod-name").value = "";
+            document.getElementById("prod-price").value = "";
+            document.getElementById("form-action-title").textContent = "إضافة عطر جديد";
+        }
+
+        // --- Start Application ---
+        document.addEventListener("DOMContentLoaded", initApp);
+
+    </script>
+</body>
+</html>

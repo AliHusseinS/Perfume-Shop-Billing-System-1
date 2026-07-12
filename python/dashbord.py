@@ -6,12 +6,12 @@ import subprocess
 import tkinter as tk
 import os
 import time
-menu_category = ["perfume","Eau De Perfume","Baby Perfume","Perfume oil"]
+menu_category = ["perfume","Eau De Perfume","Baby perfumes","Perfume oil"]
 
 menu_category_dict = {"perfume":"2 perfume.txt",
                 
                 "Eau De Perfume":"4 Eau De Perfume.txt","Baby perfumes":"5 Baby perfumes.txt",
-                "Perfume oil":"6 Perfume oil.txt"}
+                "Perfume oil":"7 Perfume oil.txt"}
 
 order_dict = {}
 for i in menu_category:

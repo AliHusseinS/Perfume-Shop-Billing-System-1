@@ -3,6 +3,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 
 import os
+import sys
 
 # import sqlite3  # If you're planning to use SQLite, uncomment and add necessary code
 
@@ -47,7 +48,7 @@ def log():
         # ims_obj = IMS(new_win)
 
         # Or, if you prefer to use the system call (this is less efficient):
-        os.system("python dashbord.py")
+        os.system(f'"{sys.executable}" dashbord.py')
 
     else:
         messagebox.showerror("Error", "Incorrect username or password")
