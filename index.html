@@ -1505,12 +1505,35 @@
             if (isLoggedIn === "true") {
                 document.getElementById("login-overlay").style.display = "none";
                 document.getElementById("main-app").classList.add("active");
+                const role = sessionStorage.getItem("user_role") || "admin";
+                applyRolePermissions(role);
             }
 
             renderCatalog();
             renderCart();
             renderInventoryTable();
             renderHistoryTable();
+        }
+
+        // --- Role Based Visibility ---
+        function applyRolePermissions(role) {
+            const navInventory = document.getElementById("nav-inventory");
+            const navHistory = document.getElementById("nav-history");
+            const userProfileName = document.querySelector(".user-profile span");
+            const userAvatar = document.querySelector(".user-avatar");
+
+            if (role === "admin") {
+                if (navInventory) navInventory.style.display = "block";
+                if (navHistory) navHistory.style.display = "block";
+                if (userProfileName) userProfileName.innerHTML = 'مرحباً، المسؤول';
+                if (userAvatar) userAvatar.textContent = 'A';
+            } else {
+                if (navInventory) navInventory.style.display = "none";
+                if (navHistory) navHistory.style.display = "none";
+                if (userProfileName) userProfileName.innerHTML = 'مرحباً، البائع';
+                if (userAvatar) userAvatar.textContent = 'S';
+                switchView('sales');
+            }
         }
 
         // --- Login Logic ---
@@ -1520,9 +1543,13 @@
             const errMsg = document.getElementById("login-error-msg");
             const loginCard = document.querySelector(".login-card");
 
-            if (user === "Admin" && pass === "1234") {
+            if (pass === "1234" && user !== "") {
                 errMsg.style.display = "none";
                 sessionStorage.setItem("perfume_admin_logged", "true");
+                
+                const role = (user.toLowerCase() === "admin") ? "admin" : "staff";
+                sessionStorage.setItem("user_role", role);
+                applyRolePermissions(role);
                 
                 // Animate overlay transition
                 const overlay = document.getElementById("login-overlay");
@@ -1544,6 +1571,7 @@
 
         function handleLogout() {
             sessionStorage.removeItem("perfume_admin_logged");
+            sessionStorage.removeItem("user_role");
             const overlay = document.getElementById("login-overlay");
             overlay.style.display = "flex";
             setTimeout(() => {
