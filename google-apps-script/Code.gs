@@ -52,16 +52,16 @@ function getCatalogFromSheet() {
  */
 function saveCatalogToSheet(catalogData) {
   const sheet = getOrCreateSheet("Catalog");
-  sheet.clear({contentsOnly: true});
+  sheet.clearContents();
   
-  if (catalogData.length > 0) {
+  if (catalogData && catalogData.length > 0) {
     const values = [["ID", "Name", "Price"]];
     catalogData.forEach(prod => {
       values.push([prod.id, prod.name, prod.price]);
     });
     sheet.getRange(1, 1, values.length, 3).setValues(values);
   } else {
-    sheet.appendRow(["ID", "Name", "Price"]);
+    sheet.getRange(1, 1, 1, 3).setValues([["ID", "Name", "Price"]]);
   }
   
   SpreadsheetApp.flush();
