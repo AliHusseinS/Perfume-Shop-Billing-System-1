@@ -1350,24 +1350,39 @@
             <!-- VIEW: INVENTORY -->
             <section id="view-inventory" class="view-panel">
                 <div class="inventory-view">
-                    <!-- Left: Form to Add/Edit Product -->
-                    <div class="inventory-form-card">
-                        <h3 id="form-action-title">إضافة عطر جديد</h3>
-                        <input type="hidden" id="edit-product-id">
-                        
-                        <div class="form-group">
-                            <label>اسم العطر</label>
-                            <input type="text" id="prod-name" class="input-control" placeholder="مثال: شانيل كوكو فاخر" autocomplete="off">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>السعر لكل mL (د.ع)</label>
-                            <input type="number" id="prod-price" class="input-control" placeholder="السعر بالدينار" min="0">
+                    <!-- Left: Form to Add/Edit Product & DB Config -->
+                    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                        <div class="inventory-form-card">
+                            <h3 id="form-action-title">إضافة عطر جديد</h3>
+                            <input type="hidden" id="edit-product-id">
+                            
+                            <div class="form-group">
+                                <label>اسم العطر</label>
+                                <input type="text" id="prod-name" class="input-control" placeholder="مثال: شانيل كوكو فاخر" autocomplete="off">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>السعر لكل mL (د.ع)</label>
+                                <input type="number" id="prod-price" class="input-control" placeholder="السعر بالدينار" min="0">
+                            </div>
+
+                            <div class="action-grid">
+                                <button onclick="saveProduct()" class="checkout-btn">حفظ المنتج</button>
+                                <button onclick="clearProductForm()" class="outline-btn">إلغاء</button>
+                            </div>
                         </div>
 
-                        <div class="action-grid">
-                            <button onclick="saveProduct()" class="checkout-btn">حفظ المنتج</button>
-                            <button onclick="clearProductForm()" class="outline-btn">إلغاء</button>
+                        <!-- Google Sheets API Configuration -->
+                        <div class="inventory-form-card" style="border-top: 4px solid var(--accent-gold);">
+                            <h3 style="color: var(--accent-gold); margin-bottom: 0.75rem;">🔗 إعدادات ربط Google Sheet</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 1rem;">
+                                قم بلصق رابط الـ Web App الخاص بك من Google Apps Script لربط النظام بقاعدة البيانات السحابية:
+                            </p>
+                            <div class="form-group">
+                                <label>رابط Google Web App API</label>
+                                <input type="text" id="db-web-app-url" class="input-control" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" style="font-size: 0.8rem;">
+                            </div>
+                            <button onclick="saveDbUrl()" class="checkout-btn" style="width: 100%; padding: 0.6rem; font-size: 0.9rem;">حفظ وإعادة الاتصال</button>
                         </div>
                     </div>
 
@@ -1467,7 +1482,8 @@
         ];
 
         // --- App State variables ---
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzSqNdQzQUgB864n81ZM311QlnxUWhcOkRmNWv0gtGhmb4dk61OucCrFAQ-K4hW06vgng/exec";
+        const DEFAULT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzSqNdQzQUgB864n81ZM311QlnxUWhcOkRmNWv0gtGhmb4dk61OucCrFAQ-K4hW06vgng/exec";
+        const WEB_APP_URL = localStorage.getItem("perfume_web_app_url") || DEFAULT_WEB_APP_URL;
         let currentTab = "sales";
         let catalog = [];
         let cart = [];
@@ -2219,8 +2235,29 @@
             document.getElementById("form-action-title").textContent = "إضافة عطر جديد";
         }
 
+        function saveDbUrl() {
+            const urlInput = document.getElementById("db-web-app-url").value.trim();
+            if (!urlInput) {
+                alert("يرجى إدخال رابط Web App صحيح.");
+                return;
+            }
+            if (!urlInput.startsWith("https://script.google.com/")) {
+                alert("يرجى التأكد من أن الرابط يبدأ بـ https://script.google.com/");
+                return;
+            }
+            localStorage.setItem("perfume_web_app_url", urlInput);
+            alert("تم حفظ رابط قاعدة البيانات السحابية بنجاح! سيتم الآن إعادة تحميل البيانات...");
+            window.location.reload();
+        }
+
         // --- Start Application ---
-        document.addEventListener("DOMContentLoaded", initApp);
+        document.addEventListener("DOMContentLoaded", () => {
+            const input = document.getElementById("db-web-app-url");
+            if (input) {
+                input.value = WEB_APP_URL;
+            }
+            initApp();
+        });
 
     </script>
 </body>
