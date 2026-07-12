@@ -1570,6 +1570,7 @@
 
         function loadLocalFallback() {
             console.log("Using localStorage fallback...");
+            hideLoader();
             try {
                 const savedCatalog = localStorage.getItem("perfume_catalog_v2");
                 if (savedCatalog) {
