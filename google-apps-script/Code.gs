@@ -52,16 +52,19 @@ function getCatalogFromSheet() {
  */
 function saveCatalogToSheet(catalogData) {
   const sheet = getOrCreateSheet("Catalog");
-  sheet.clear();
+  sheet.clear({contentsOnly: true});
   
-  // Set headers
-  sheet.appendRow(["ID", "Name", "Price"]);
+  if (catalogData.length > 0) {
+    const values = [["ID", "Name", "Price"]];
+    catalogData.forEach(prod => {
+      values.push([prod.id, prod.name, prod.price]);
+    });
+    sheet.getRange(1, 1, values.length, 3).setValues(values);
+  } else {
+    sheet.appendRow(["ID", "Name", "Price"]);
+  }
   
-  // Append data rows
-  catalogData.forEach(prod => {
-    sheet.appendRow([prod.id, prod.name, prod.price]);
-  });
-  
+  SpreadsheetApp.flush();
   return true;
 }
 
