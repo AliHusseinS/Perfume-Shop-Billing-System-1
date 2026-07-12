@@ -1,11 +1,52 @@
 const SPREADSHEET_ID = "1fHCg3gEW8zqVBmIPUFC1NKA85LW04kIWYPRHnIBwUT8";
 
-function doGet() {
+function doGet(e) {
+  // If request contains API parameters, serve JSON API response
+  if (e && e.parameter && e.parameter.action) {
+    const action = e.parameter.action;
+    let result = {};
+    if (action === "getCatalog") {
+      result = getCatalogFromSheet();
+    } else if (action === "getHistory") {
+      result = getInvoicesFromSheet();
+    } else if (action === "getAll") {
+      result = {
+        catalog: getCatalogFromSheet(),
+        history: getInvoicesFromSheet()
+      };
+    }
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  // Otherwise, serve the HTML page
   return HtmlService.createTemplateFromFile('Index')
       .evaluate()
       .setTitle('نظام المبيعات')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function doPost(e) {
+  try {
+    const postData = JSON.parse(e.postData.contents);
+    const action = postData.action;
+    let result = { success: false };
+    
+    if (action === "saveCatalog") {
+      saveCatalogToSheet(postData.data);
+      result.success = true;
+    } else if (action === "addInvoice") {
+      addInvoiceToSheet(postData.data);
+      result.success = true;
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 /**

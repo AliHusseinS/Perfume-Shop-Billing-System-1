@@ -1467,6 +1467,7 @@
         ];
 
         // --- App State variables ---
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzSqNdQzQUgB864n81ZM311QlnxUWhcOkRmNWv0gtGhmb4dk61OucCrFAQ-K4hW06vgng/exec";
         let currentTab = "sales";
         let catalog = [];
         let cart = [];
@@ -1499,15 +1500,16 @@
                 applyRolePermissions(role);
             }
 
-            // Sync with Google Sheet or LocalStorage fallback
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
+            // Sync with Google Sheet (either via google.script.run or via fetch API)
+            const isAppsScriptEnv = typeof google !== 'undefined' && google.script && google.script.run;
+            
+            if (isAppsScriptEnv) {
                 showLoader("جاري تحميل قائمة العطور والبيانات من السحابة...");
                 google.script.run.withSuccessHandler(function(serverCatalog) {
                     if (serverCatalog && serverCatalog.length > 0) {
                         catalog = serverCatalog;
                         loadHistoryFromServer();
                     } else {
-                        // Sheet is empty, initialize with defaults
                         catalog = [...defaultCatalog];
                         google.script.run.withSuccessHandler(function() {
                             loadHistoryFromServer();
@@ -1518,7 +1520,32 @@
                     loadLocalFallback();
                 }).getCatalogFromSheet();
             } else {
-                loadLocalFallback();
+                showLoader("جاري تحميل قائمة العطور والبيانات من السحابة (GitHub Pages)...");
+                fetch(`${WEB_APP_URL}?action=getAll`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.catalog && data.catalog.length > 0) {
+                            catalog = data.catalog;
+                        } else {
+                            catalog = [...defaultCatalog];
+                            // Try to initialize catalog on the server
+                            fetch(WEB_APP_URL, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                body: JSON.stringify({ action: 'saveCatalog', data: catalog })
+                            });
+                        }
+                        history = data.history || [];
+                        hideLoader();
+                        renderCatalog();
+                        renderCart();
+                        renderInventoryTable();
+                        renderHistoryTable();
+                    })
+                    .catch(err => {
+                        console.error("Failed to fetch catalog from Google Sheet API", err);
+                        loadLocalFallback();
+                    });
             }
         }
 
@@ -1937,16 +1964,36 @@
                     hideLoader();
                 }).addInvoiceToSheet(newInvoice);
             } else {
-                history.unshift(newInvoice);
-                localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
-                // Open Modal
-                document.getElementById("bill-modal").classList.add("active");
-                // Reset current cart
-                cart = [];
-                document.getElementById("customer-name").value = "";
-                document.getElementById("customer-phone").value = "";
-                renderCart();
-                renderHistoryTable();
+                showLoader("جاري تسجيل الفاتورة وحفظها سحابياً...");
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: 'addInvoice', data: newInvoice })
+                }).then(() => {
+                    hideLoader();
+                    history.unshift(newInvoice);
+                    // Open Modal
+                    document.getElementById("bill-modal").classList.add("active");
+                    // Reset current cart
+                    cart = [];
+                    document.getElementById("customer-name").value = "";
+                    document.getElementById("customer-phone").value = "";
+                    renderCart();
+                    renderHistoryTable();
+                }).catch(err => {
+                    console.error("Failed to add invoice via fetch", err);
+                    history.unshift(newInvoice);
+                    localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
+                    hideLoader();
+                    // Open Modal
+                    document.getElementById("bill-modal").classList.add("active");
+                    // Reset current cart
+                    cart = [];
+                    document.getElementById("customer-name").value = "";
+                    document.getElementById("customer-phone").value = "";
+                    renderCart();
+                    renderHistoryTable();
+                });
             }
         }
 
@@ -2098,10 +2145,24 @@
                     hideLoader();
                 }).saveCatalogToSheet(catalog);
             } else {
-                localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
-                clearProductForm();
-                renderInventoryTable();
-                renderCatalog();
+                showLoader("جاري حفظ وتحديث قائمة المنتجات سحابياً...");
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: 'saveCatalog', data: catalog })
+                }).then(() => {
+                    hideLoader();
+                    clearProductForm();
+                    renderInventoryTable();
+                    renderCatalog();
+                }).catch(err => {
+                    console.error("Failed to save catalog via fetch", err);
+                    localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                    hideLoader();
+                    clearProductForm();
+                    renderInventoryTable();
+                    renderCatalog();
+                });
             }
         }
 
@@ -2130,9 +2191,22 @@
                         hideLoader();
                     }).saveCatalogToSheet(catalog);
                 } else {
-                    localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
-                    renderInventoryTable();
-                    renderCatalog();
+                    showLoader("جاري حذف المنتج وتحديث السحابة...");
+                    fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ action: 'saveCatalog', data: catalog })
+                    }).then(() => {
+                        hideLoader();
+                        renderInventoryTable();
+                        renderCatalog();
+                    }).catch(err => {
+                        console.error("Failed to delete catalog via fetch", err);
+                        localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                        hideLoader();
+                        renderInventoryTable();
+                        renderCatalog();
+                    });
                 }
             }
         }
