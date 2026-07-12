@@ -71,10 +71,8 @@
             20%, 60% { transform: translateX(-6px); }
             40%, 80% { transform: translateX(6px); }
         }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(207, 168, 96, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(207, 168, 96, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(207, 168, 96, 0); }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .animate-fade-in {
@@ -1195,6 +1193,12 @@
 </head>
 <body>
 
+    <!-- LOADER OVERLAY -->
+    <div id="loader-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:9999; flex-direction:column; gap:1.5rem; transition: all 0.3s ease;">
+        <div style="width: 50px; height: 50px; border: 5px solid rgba(0, 128, 128, 0.1); border-top-color: var(--accent-pink); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <div style="font-weight: 700; color: var(--accent-gold); font-size: 1.1rem;" id="loader-text">يرجى الانتظار... جاري تحديث البيانات سحابياً</div>
+    </div>
+
     <!-- LOGIN SCREEN -->
     <div id="login-overlay">
         <div class="login-card">
@@ -1471,35 +1475,24 @@
         let cart = [];
         let history = [];
 
+        // --- Loader Helpers ---
+        function showLoader(msg) {
+            const loader = document.getElementById("loader-overlay");
+            const text = document.getElementById("loader-text");
+            if (loader && text) {
+                text.textContent = msg || "يرجى الانتظار...";
+                loader.style.display = "flex";
+            }
+        }
+        function hideLoader() {
+            const loader = document.getElementById("loader-overlay");
+            if (loader) {
+                loader.style.display = "none";
+            }
+        }
+
         // --- Initialize Database & State ---
         function initApp() {
-            // Load state from localStorage or load defaults
-            try {
-                const savedCatalog = localStorage.getItem("perfume_catalog_v2");
-                if (savedCatalog) {
-                    catalog = JSON.parse(savedCatalog);
-                } else {
-                    catalog = [...defaultCatalog];
-                    localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
-                }
-            } catch (e) {
-                console.error("Error parsing catalog, loading defaults", e);
-                catalog = [...defaultCatalog];
-            }
-
-            try {
-                const savedHistory = localStorage.getItem("perfume_billing_history_v2");
-                if (savedHistory) {
-                    history = JSON.parse(savedHistory);
-                } else {
-                    history = [];
-                    localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
-                }
-            } catch (e) {
-                console.error("Error parsing history, loading defaults", e);
-                history = [];
-            }
-
             // Check if logged in in this session
             const isLoggedIn = sessionStorage.getItem("perfume_admin_logged");
             if (isLoggedIn === "true") {
@@ -1509,6 +1502,72 @@
                 applyRolePermissions(role);
             }
 
+            // Sync with Google Sheet or LocalStorage fallback
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                showLoader("جاري تحميل قائمة العطور والبيانات من السحابة...");
+                google.script.run.withSuccessHandler(function(serverCatalog) {
+                    if (serverCatalog && serverCatalog.length > 0) {
+                        catalog = serverCatalog;
+                        loadHistoryFromServer();
+                    } else {
+                        // Sheet is empty, initialize with defaults
+                        catalog = [...defaultCatalog];
+                        google.script.run.withSuccessHandler(function() {
+                            loadHistoryFromServer();
+                        }).saveCatalogToSheet(catalog);
+                    }
+                }).withFailureHandler(function(err) {
+                    console.error("Failed to load catalog from sheet", err);
+                    loadLocalFallback();
+                }).getCatalogFromSheet();
+            } else {
+                loadLocalFallback();
+            }
+        }
+
+        function loadHistoryFromServer() {
+            showLoader("جاري تحميل سجل الفواتير والمبيعات سحابياً...");
+            google.script.run.withSuccessHandler(function(serverHistory) {
+                history = serverHistory;
+                hideLoader();
+                renderCatalog();
+                renderCart();
+                renderInventoryTable();
+                renderHistoryTable();
+            }).withFailureHandler(function(err) {
+                console.error("Failed to load history from sheet", err);
+                hideLoader();
+                renderCatalog();
+                renderCart();
+                renderInventoryTable();
+                renderHistoryTable();
+            }).getInvoicesFromSheet();
+        }
+
+        function loadLocalFallback() {
+            console.log("Using localStorage fallback...");
+            try {
+                const savedCatalog = localStorage.getItem("perfume_catalog_v2");
+                if (savedCatalog) {
+                    catalog = JSON.parse(savedCatalog);
+                } else {
+                    catalog = [...defaultCatalog];
+                    localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                }
+            } catch (e) {
+                catalog = [...defaultCatalog];
+            }
+
+            try {
+                const savedHistory = localStorage.getItem("perfume_billing_history_v2");
+                if (savedHistory) {
+                    history = JSON.parse(savedHistory);
+                } else {
+                    history = [];
+                }
+            } catch (e) {
+                history = [];
+            }
             renderCatalog();
             renderCart();
             renderInventoryTable();
@@ -1808,9 +1867,6 @@
                 total: total
             };
 
-            history.unshift(newInvoice); // Add to beginning of array
-            localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
-
             // Load Print HTML Template
             let itemsHtml = "";
             newInvoice.items.forEach((item, index) => {
@@ -1866,15 +1922,35 @@
                 </div>
             `;
 
-            // Open Modal
-            document.getElementById("bill-modal").classList.add("active");
-
-            // Reset current cart
-            cart = [];
-            document.getElementById("customer-name").value = "";
-            document.getElementById("customer-phone").value = "";
-            renderCart();
-            renderHistoryTable();
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                showLoader("جاري تسجيل الفاتورة وحفظها سحابياً...");
+                google.script.run.withSuccessHandler(function() {
+                    hideLoader();
+                    history.unshift(newInvoice);
+                    // Open Modal
+                    document.getElementById("bill-modal").classList.add("active");
+                    // Reset current cart
+                    cart = [];
+                    document.getElementById("customer-name").value = "";
+                    document.getElementById("customer-phone").value = "";
+                    renderCart();
+                    renderHistoryTable();
+                }).withFailureHandler(function(err) {
+                    alert("فشل تسجيل الفاتورة في جداول جوجل: " + err);
+                    hideLoader();
+                }).addInvoiceToSheet(newInvoice);
+            } else {
+                history.unshift(newInvoice);
+                localStorage.setItem("perfume_billing_history_v2", JSON.stringify(history));
+                // Open Modal
+                document.getElementById("bill-modal").classList.add("active");
+                // Reset current cart
+                cart = [];
+                document.getElementById("customer-name").value = "";
+                document.getElementById("customer-phone").value = "";
+                renderCart();
+                renderHistoryTable();
+            }
         }
 
         function closeBillModal() {
@@ -2013,10 +2089,23 @@
                 });
             }
 
-            localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
-            clearProductForm();
-            renderInventoryTable();
-            renderCatalog();
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                showLoader("جاري حفظ وتحديث قائمة المنتجات سحابياً...");
+                google.script.run.withSuccessHandler(function() {
+                    hideLoader();
+                    clearProductForm();
+                    renderInventoryTable();
+                    renderCatalog();
+                }).withFailureHandler(function(err) {
+                    alert("فشل تحديث البيانات في جداول جوجل: " + err);
+                    hideLoader();
+                }).saveCatalogToSheet(catalog);
+            } else {
+                localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                clearProductForm();
+                renderInventoryTable();
+                renderCatalog();
+            }
         }
 
         function editProduct(id) {
@@ -2033,9 +2122,21 @@
         function deleteProduct(id) {
             if (confirm("هل أنت متأكد من رغبتك في حذف هذا العطر من القائمة؟")) {
                 catalog = catalog.filter(p => p.id !== id);
-                localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
-                renderInventoryTable();
-                renderCatalog();
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    showLoader("جاري حذف المنتج وتحديث السحابة...");
+                    google.script.run.withSuccessHandler(function() {
+                        hideLoader();
+                        renderInventoryTable();
+                        renderCatalog();
+                    }).withFailureHandler(function(err) {
+                        alert("فشل حذف المنتج من جداول جوجل: " + err);
+                        hideLoader();
+                    }).saveCatalogToSheet(catalog);
+                } else {
+                    localStorage.setItem("perfume_catalog_v2", JSON.stringify(catalog));
+                    renderInventoryTable();
+                    renderCatalog();
+                }
             }
         }
 
