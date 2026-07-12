@@ -2074,7 +2074,7 @@
 
             if (editId) {
                 // EDIT EXISTING
-                const prod = catalog.find(p => p.id === parseInt(editId));
+                const prod = catalog.find(p => p.id == editId);
                 if (prod) {
                     prod.name = name;
                     prod.price = price;
@@ -2109,7 +2109,7 @@
         }
 
         function editProduct(id) {
-            const prod = catalog.find(p => p.id === id);
+            const prod = catalog.find(p => p.id == id);
             if (!prod) return;
 
             document.getElementById("edit-product-id").value = prod.id;
@@ -2121,7 +2121,7 @@
 
         function deleteProduct(id) {
             if (confirm("هل أنت متأكد من رغبتك في حذف هذا العطر من القائمة؟")) {
-                catalog = catalog.filter(p => p.id !== id);
+                catalog = catalog.filter(p => p.id != id);
                 if (typeof google !== 'undefined' && google.script && google.script.run) {
                     showLoader("جاري حذف المنتج وتحديث السحابة...");
                     google.script.run.withSuccessHandler(function() {
